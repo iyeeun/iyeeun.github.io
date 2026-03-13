@@ -387,7 +387,7 @@ header {
   }
 }
 
-@mixin slide-in {
+@mixin slide-in-keyframes {
   from {
     opacity: 0.7;
     transform: translateY(-#{v.$topbar-height});
@@ -399,32 +399,32 @@ header {
   }
 }
 
-@mixin slide-out {
-  0% {
+@mixin slide-out-keyframes {
+  from {
     transform: translateY(0);
     opacity: 1;
   }
 
-  100% {
+  to {
     transform: translateY(-#{v.$topbar-height});
     opacity: 0;
   }
 }
 
 @-webkit-keyframes slide-in {
-  @include slide-in;
+  @include slide-in-keyframes;
 }
 
 @keyframes slide-in {
-  @include slide-in;
+  @include slide-in-keyframes;
 }
 
 @-webkit-keyframes slide-out {
-  @include slide-out;
+  @include slide-out-keyframes;
 }
 
 @keyframes slide-out {
-  @include slide-out;
+  @include slide-out-keyframes;
 }
 
 /* --- Related Posts --- */
