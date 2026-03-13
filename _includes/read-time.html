@@ -24,14 +24,28 @@
   data-bs-placement="bottom"
   title="{{ words }} {{ site.data.locales[include.lang].post.words }}"
 >
+  {%- if include.prompt -%}
+    {%- if include.lang == 'ko-KR' or include.lang == 'ko' -%}
+      {{ read_prompt }}
+      {{ ' ' }}
+    {%- endif -%}
+  {%- endif -%}
+
   <em>
     {{- read_time -}}
-    {{ ' ' }}
+    {%- unless include.lang == 'ko-KR' or include.lang == 'ko' -%}
+      {{ ' ' }}
+    {%- endunless -%}
     {{- site.data.locales[include.lang].post.read_time.unit -}}
   </em>
+
   {%- if include.prompt -%}
-    {%- assign _prompt_words = read_prompt | number_of_words: 'auto' -%}
-    {%- unless _prompt_words > 1 -%}{{ ' ' }}{%- endunless -%}
-    {{ read_prompt }}
+    {%- unless include.lang == 'ko-KR' or include.lang == 'ko' -%}
+      {%- assign _prompt_words = read_prompt | number_of_words: 'auto' -%}
+      {%- unless _prompt_words > 1 -%}
+        {{ ' ' }}
+      {%- endunless -%}
+      {{ read_prompt }}
+    {%- endunless -%}
   {%- endif -%}
 </span>
