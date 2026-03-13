@@ -10,4 +10,7 @@ _site/
 .bundle/
 vendor/
 
+node_modules/
+assets/js/dist/
+
 # End of https://www.toptal.com/developers/gitignore/api/jekyll
