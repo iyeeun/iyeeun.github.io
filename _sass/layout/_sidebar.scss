@@ -114,6 +114,7 @@ $sidebar-display: 'sidebar-display'; /* the attribute for sidebar display */
     color: var(--site-subtitle-color);
     margin-top: 0.25rem;
     word-spacing: 1px;
+    white-space: pre-line;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
