@@ -14,7 +14,7 @@ tabs:
   categories: 카테고리
   tags: 태그
   archives: 아카이브
-  about: 정보
+  about: About
 
 # the text displayed in the search bar & search results
 search:
@@ -53,8 +53,8 @@ notification:
 
 post:
   written_by: By
-  posted: 게시
-  updated: 업데이트
+  posted: 게시일
+  updated: 업데이트일
   words: 단어
   pageview_measure: 조회
   read_time:
