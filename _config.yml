@@ -16,7 +16,11 @@ timezone: Asia/Seoul
 
 title: 이음 ieum # the main title
 
-tagline: "by iyeeun\n\nConnect knowledge,\nBridge technology to people" # it will display as the subtitle
+tagline: |
+  by iyeeun
+
+  Connect knowledge,
+  Bridge technology to people
 
 description: >- # used by seo meta and the atom feed
   지식을 잇고 기술과 사람을 잇는 기록의 공간. 코드 너머의 본질을 탐구하며 사랑으로 함께 성장합니다.
