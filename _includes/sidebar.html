@@ -18,6 +18,17 @@
 
   <nav class="flex-column flex-grow-1 w-100 ps-0">
     <ul class="nav">
+      <!-- About (Manually placed at top) -->
+      {% assign about_tab = site.tabs | where: "title", "About" | first %}
+      {% if about_tab %}
+      <li class="nav-item{% if about_tab.url == page.url %}{{ " active" }}{% endif %}">
+        <a href="{{ about_tab.url | relative_url }}" class="nav-link">
+          <i class="fa-fw {{ about_tab.icon }}"></i>
+          <span>{{ site.data.locales[include.lang].tabs.about | default: about_tab.title | upcase }}</span>
+        </a>
+      </li>
+      {% endif %}
+
       <!-- home -->
       <li class="nav-item{% if page.layout == 'home' %}{{ " active" }}{% endif %}">
         <a href="{{ '/' | relative_url }}" class="nav-link">
@@ -25,17 +36,17 @@
           <span>{{ site.data.locales[include.lang].tabs.home | upcase }}</span>
         </a>
       </li>
-      <!-- the real tabs -->
-      {% for tab in site.tabs %}
-        <li class="nav-item{% if tab.url == page.url %}{{ " active" }}{% endif %}">
-          <a href="{{ tab.url | relative_url }}" class="nav-link">
-            <i class="fa-fw {{ tab.icon }}"></i>
-            {% capture tab_name %}{{ tab.url | split: '/' }}{% endcapture %}
 
-            <span>{{ site.data.locales[include.lang].tabs.[tab_name] | default: tab.title | upcase }}</span>
-          </a>
-        </li>
-        <!-- .nav-item -->
+      <!-- the rest of the tabs -->
+      {% for tab in site.tabs %}
+      {% if tab.title == "About" %}{% continue %}{% endif %}
+      <li class="nav-item{% if tab.url == page.url %}{{ " active" }}{% endif %}">
+        <a href="{{ tab.url | relative_url }}" class="nav-link">
+          <i class="fa-fw {{ tab.icon }}"></i>
+          {% capture tab_name %}{{ tab.url | split: '/' | last }}{% endcapture %}
+          <span>{{ site.data.locales[include.lang].tabs.[tab_name] | default: tab.title | upcase }}</span>
+        </a>
+      </li>
       {% endfor %}
     </ul>
   </nav>
