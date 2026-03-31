@@ -4,5 +4,37 @@ icon: fas fa-info-circle
 order: 4
 ---
 
-> Add Markdown syntax content to file `_tabs/about.md`{: .filepath } and it will show up on this page.
-{: .prompt-tip }
+> _All things grow with love 🌱_
+
+---
+
+안녕하세요,  
+화면을 그리는 것을 넘어 **사람과 사람 사이의 경험을 설계**하고,  
+**서비스의 가치를 자연스럽게 전달**하는 프론트엔드 개발자 이예은입니다.
+
+## 👩🏻‍💻 About Me
+
+저는 기술이 단순한 기능 구현이 아니라  
+**사람의 경험을 설계하는 도구**라고 생각합니다.
+
+- 사용자가 편하게 쓸 수 있는 화면을 만들고,
+- 동료가 이해하기 쉬운 구조를 설계하며,
+- 반복되는 문제를 시스템적으로 해결하는 방식을 고민합니다.
+
+그 과정에서 문제를 단순히 해결하는 것보다  
+**구조적으로 정의하고 선택의 이유를 설명할 수 있는 개발**을 지향합니다.
+
+## 🪵 About This Blog
+
+**이음(ieum)**은 **지식과 경험이 단절되지 않고 연결되는 과정**을 기록하는 공간입니다.
+
+- 배운 내용을 단순 정리가 아닌 맥락으로 연결하고
+- 생각의 변화 과정을 기록하며
+- 기술과 사람, 그리고 경험이 이어지는 흐름을 만들어갑니다.
+
+주로 TIL (Today I Learned), 기술 개념 정리, 개발 과정에서의 고민과 선택을 기록합니다.
+
+## 📫 Contact
+
+- [GitHub](https://github.com/iyeeun)
+- [Velog](https://velog.io/@iyeeun/posts)
