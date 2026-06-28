@@ -160,6 +160,60 @@ END;
 $$ LANGUAGE plpgsql VOLATILE;
 ```
 
-해당 SQL을 실행하고 나서 다시 마이그레이션을 실행해보니 문제 없이 완료되었다. 😊
+해당 SQL을 실행하고 나서 다시 마이그레이션을 실행해보니 문제 없이 완료되었다.
 
 ![마이그레이션 후의 Supabase Tables](/assets/img/posts/20260625/supabase-tables.png)
+
+### 트러블슈팅 3: 로그인할 때 Invalid UUID 에러 발생
+
+DB 마이그레이션도 성공하고 서버도 정상적으로 켜졌으나, 브라우저에서 로그인을 시도하자 화면에 `400 Bad Request`와 함께 `invalid uuid` 에러가 발생했다.
+
+#### 1. 원인: Postgres와 Zod의 차이
+
+Supabase의 PostgreSQL은 32자리 16진수 문자열이기만 하면 유효한 UUID로 간주하여 에러 없이 테이블에 저장한다.  
+하지만 프론트/백엔드 공통 스키마에 정의된 Zod는 표준 규격(RFC 4122 / RFC 9562)을 검사하고 있었다. (`z.uuid({ version: 'v7' })`)  
+표준 규격에 따르면 UUID v7은 4번째 그룹의 첫 문자(19번째 문자)가 **버전 변형(Variant) 비트**를 나타내는 **8, 9, a, b** 중 하나여야 한다.  
+하지만 이전의 `uuidv7()` 함수는 임의의 난수로 채우다 보니 Zod 검증에 걸려 400 에러가 발생한 것이다.
+
+#### 2. 해결: Variant 비트 강제 주입
+
+```sql
+CREATE OR REPLACE FUNCTION uuidv7() RETURNS uuid AS $$
+DECLARE
+  v_bytes bytea;
+  v_gts bigint;
+BEGIN
+  v_gts := (EXTRACT(EPOCH FROM clock_timestamp()) * 1000)::bigint;
+  v_bytes := gen_random_bytes(16);
+
+  -- bytes 0-5: 48비트 타임스탬프 (big-endian)
+  v_bytes := set_byte(v_bytes, 0, ((v_gts >> 40) & 255)::int);
+  v_bytes := set_byte(v_bytes, 1, ((v_gts >> 32) & 255)::int);
+  v_bytes := set_byte(v_bytes, 2, ((v_gts >> 24) & 255)::int);
+  v_bytes := set_byte(v_bytes, 3, ((v_gts >> 16) & 255)::int);
+  v_bytes := set_byte(v_bytes, 4, ((v_gts >> 8) & 255)::int);
+  v_bytes := set_byte(v_bytes, 5, (v_gts & 255)::int);
+
+  -- byte 6 상위 4비트: version = 7 (0111xxxx)
+  v_bytes := set_byte(v_bytes, 6, (get_byte(v_bytes, 6) & 15) | 112);
+
+  -- byte 8 상위 2비트: variant = 10 (10xxxxxx)
+  v_bytes := set_byte(v_bytes, 8, (get_byte(v_bytes, 8) & 63) | 128);
+
+  RETURN encode(v_bytes, 'hex')::uuid;
+END;
+$$ LANGUAGE plpgsql VOLATILE;
+```
+
+이전 함수와 비교해 달라진 점은 크게 두 가지다.
+
+1\. 난수 생성 방식을 `random()`에서 `gen_random_bytes(16)`으로 교체했다.  
+`random()`은 PostgreSQL 내부의 유사난수(pseudorandom) 생성기를 사용하는 반면, `gen_random_bytes()`는 운영체제의 암호학적 난수 소스(`/dev/urandom` 등)를 사용한다.  
+UUID를 외부에 노출하는 식별자로 사용할 때 예측 가능성을 낮추려면 후자가 낫다.
+
+2\. 비트 연산으로 version과 variant를 명시적으로 세팅한다.  
+이전 함수는 16진수 문자열을 그냥 이어 붙이는 방식이라 UUID의 19번째 문자(variant nibble)가 `0` ~ `f` 중 완전히 랜덤하게 결정되었다.  
+RFC 9562 기준으로 유효한 값은 8, 9, a, b뿐이므로, 약 75% 확률로 규격에 맞지 않는 UUID가 생성되어 Zod 검증에서 실패했다.  
+새 함수는 `gen_random_bytes()`로 만든 16바이트에서 byte 8의 상위 2비트만 `10`으로 마스킹하여 덮어쓰기 때문에, variant nibble은 항상 8, 9, a, b 중 하나가 되면서 나머지 6비트는 온전히 랜덤을 유지한다.
+
+이 함수를 Supabase SQL Editor에서 실행한 뒤 로그인을 시도하니 정상적으로 동작했다.
